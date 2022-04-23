@@ -1,0 +1,3 @@
+mongodb+srv://alpha:camp@cluster0.5vbhv.mongodb.net/todo-list?retryWrites=true&w=majority
+
+set "MONGODB_URI=mongodb+srv://alpha:camp@cluster0.5vbhv.mongodb.net/todo-list?retryWrites=true&w=majority"
