@@ -2,6 +2,8 @@ const express = require('express')
 const mongoose = require('mongoose')
 const exphbs = require('express-handlebars')
 
+const Todo = require('./models/todo') //import Todo model
+
 const app = express()
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
@@ -20,9 +22,14 @@ app.engine('handlebars', exphbs({ defaultLayout: 'main'}))
 app.set('view engine', 'handlebars')
 
 app.use('/', (req, res) => {
-  res.render('index')
+  Todo.find()
+    .lean()
+    .then(todos => {
+      res.render('index', {todos})
+    })
+    .catch(error => console.log(error))
 })
 
 app.listen(3000, () => {
-  console.log('App is Run on Port: 3000')
+  console.log('App is Run on http://localhost:3000/')
 })
