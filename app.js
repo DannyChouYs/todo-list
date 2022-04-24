@@ -25,6 +25,7 @@ app.set('view engine', 'handlebars')
 
 app.use(bodyParser.urlencoded({extended: true}))
 
+// render index
 app.get('/', (req, res) => {
   Todo.find()
     .lean()
@@ -34,26 +35,51 @@ app.get('/', (req, res) => {
     .catch(error => console.log(error))
 })
 
+// render new page
 app.get('/todos/new', (req, res) => {
   return res.render('new')
 })
 
+// insert new data
 app.post('/todos', (req, res) => {
   const name = req.body.name
-  // const todo = new Todo({
-  //   name: name
-  // })
   return Todo.create({name})
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
 })
 
+// render individual todo
 app.get('/todos/:id', (req, res) => {
   const id = req.params.id
-  console.log('req.params.id', req.params.id)
   return Todo.findById(id)
     .lean()
-    .then(todo => res.render('detail', {todo}))
+    .then(todo => {
+      res.render('detail', {todo})
+    })
+    .catch(error => console.lpg(error))
+})
+
+// render edit page
+app.get('/todos/:id/edit', (req, res) => {
+  const id = req.params.id
+  return Todo.findById(id)
+    .lean()
+    .then(todo => {
+      res.render('edit', {todo})
+    })
+    .catch(error => console.lpg(error))
+})
+
+// update data
+app.post('/todos/:id/edit', (req, res) => {
+  const id = req.params.id
+  const name = req.body.name
+  return Todo.findById(id)
+    .then(todo => {
+      todo.name = name
+      return todo.save()
+    })
+    .then(() => res.redirect(`/todos/${id}`))
     .catch(error => console.lpg(error))
 })
 
