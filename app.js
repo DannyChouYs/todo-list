@@ -5,6 +5,9 @@ const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 
 const Todo = require('./models/todo') //import Todo model
+
+const routes = require('./routes')
+
 const { redirect } = require('express/lib/response')
 
 const app = express()
@@ -28,74 +31,8 @@ app.use(bodyParser.urlencoded({extended: true}))
 
 app.use(methodOverride('_method')) // 設定每一筆請求都會透過 methodOverride 進行前置處理
 
-// render index
-app.get('/', (req, res) => {
-  Todo.find()
-    .lean()
-    .sort({_id: 'asc'})
-    .then(todos => {
-      res.render('index', {todos})
-    })
-    .catch(error => console.log(error))
-})
+app.use(routes)
 
-// render new page
-app.get('/todos/new', (req, res) => {
-  return res.render('new')
-})
-
-// insert new data
-app.post('/todos', (req, res) => {
-  const name = req.body.name
-  return Todo.create({name})
-    .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
-})
-
-// render individual todo
-app.get('/todos/:id', (req, res) => {
-  const id = req.params.id
-  return Todo.findById(id)
-    .lean()
-    .then(todo => {
-      res.render('detail', {todo})
-    })
-    .catch(error => console.lpg(error))
-})
-
-// render edit page
-app.get('/todos/:id/edit', (req, res) => {
-  const id = req.params.id
-  return Todo.findById(id)
-    .lean()
-    .then(todo => {
-      res.render('edit', {todo})
-    })
-    .catch(error => console.lpg(error))
-})
-
-// update data
-app.put('/todos/:id', (req, res) => {
-  const id = req.params.id
-  const {name, isDone} = req.body
-  return Todo.findById(id)
-    .then(todo => {
-      todo.name = name
-      todo.isDone = isDone === 'on'
-      return todo.save()
-    })
-    .then(() => res.redirect(`/todos/${id}`))
-    .catch(error => console.lpg(error))
-})
-
-// delete data
-app.delete('/todos/:id', (req, res) => {
-  const id = req.params.id
-  return Todo.findById(id)
-    .then(todo => todo.remove())
-    .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
-})
 
 app.listen(3000, () => {
   console.log('App is Run on http://localhost:3000/')
